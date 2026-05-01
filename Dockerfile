@@ -9,7 +9,6 @@ RUN npm install --omit=dev --no-audit --no-fund
 # copy source
 COPY server.js extract.js ./
 COPY views ./views
-COPY public ./public
 
 # 'data' directory is mounted as a persistent volume in Coolify
 RUN mkdir -p /app/data
