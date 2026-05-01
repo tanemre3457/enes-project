@@ -1,0 +1,17 @@
+{
+  "name": "speakup-youth",
+  "version": "1.0.0",
+  "description": "Speak Up Youth — site + admin panel",
+  "main": "server.js",
+  "scripts": {
+    "extract": "node extract.js",
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0"
+  }
+}

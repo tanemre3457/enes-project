@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Speak Up Youth</title>
+<style>
+  :root { --navy:#1F3A8A; --teal:#14A6A0; --gold:#E8B647; --paper:#FAF7EE; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--paper);color:var(--navy);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+  .card{background:#fff;border:1px solid rgba(31,58,138,.12);padding:2.5rem;width:100%;max-width:380px;box-shadow:0 4px 20px rgba(31,58,138,.06)}
+  h1{font-family:Georgia,serif;font-size:1.6rem;letter-spacing:-.02em;margin-bottom:.4rem}
+  .sub{font-size:.85rem;color:rgba(31,58,138,.6);margin-bottom:1.8rem}
+  label{display:block;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:.4rem;color:rgba(31,58,138,.7)}
+  input{width:100%;padding:.7rem .9rem;border:1px solid rgba(31,58,138,.2);background:#fff;font-size:.95rem;font-family:inherit;color:var(--navy);margin-bottom:1.1rem;transition:border-color .15s}
+  input:focus{outline:none;border-color:var(--teal)}
+  button{width:100%;padding:.85rem;background:var(--navy);color:var(--paper);border:none;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;cursor:pointer;transition:background .2s}
+  button:hover{background:var(--teal)}
+  .err{background:#fee;border-left:3px solid #c33;padding:.7rem .9rem;font-size:.85rem;color:#900;margin-bottom:1.2rem}
+</style>
+</head>
+<body>
+  <form class="card" method="post" action="/admin/login">
+    <h1>Yönetici Girişi</h1>
+    <div class="sub">Speak Up Youth · içerik paneli</div>
+    <!--ERROR-->
+    <label for="u">Kullanıcı adı</label>
+    <input id="u" name="username" required autocomplete="username" autofocus>
+    <label for="p">Şifre</label>
+    <input id="p" name="password" type="password" required autocomplete="current-password">
+    <button type="submit">Giriş yap</button>
+  </form>
+</body>
+</html>

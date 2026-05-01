@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>İçerik Paneli · Speak Up Youth</title>
+<style>
+  :root { --navy:#1F3A8A; --navy-deep:#0F1F4D; --teal:#14A6A0; --gold:#E8B647; --paper:#FAF7EE; --paper-warm:#F2EDDB; --border:rgba(31,58,138,.12); --muted:rgba(31,58,138,.6); }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--paper);color:var(--navy);min-height:100vh;line-height:1.45}
+
+  header{position:sticky;top:0;z-index:10;background:rgba(250,247,238,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+  header h1{font-family:Georgia,serif;font-size:1.15rem;letter-spacing:-.02em;font-weight:700}
+  header .meta{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .actions{display:flex;gap:.6rem;align-items:center}
+  button,.btn{padding:.55rem 1rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;cursor:pointer;border:1px solid var(--navy);background:transparent;color:var(--navy);font-family:inherit;transition:all .15s;text-decoration:none;display:inline-block}
+  button:hover,.btn:hover{background:var(--navy);color:var(--paper)}
+  button.primary{background:var(--navy);color:var(--paper)}
+  button.primary:hover{background:var(--teal);border-color:var(--teal)}
+  button.ghost{border-color:var(--border);color:var(--muted)}
+  button.ghost:hover{background:transparent;color:var(--navy);border-color:var(--navy)}
+
+  .toolbar{padding:1rem 1.5rem;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--border);background:var(--paper-warm)}
+  .toolbar input[type=search]{flex:1;min-width:220px;padding:.55rem .8rem;border:1px solid var(--border);font-family:inherit;font-size:.9rem;background:#fff;color:var(--navy)}
+  .toolbar input[type=search]:focus{outline:none;border-color:var(--teal)}
+  .toolbar select{padding:.55rem .8rem;border:1px solid var(--border);font-family:inherit;font-size:.85rem;background:#fff;color:var(--navy);cursor:pointer}
+
+  main{padding:1.5rem;max-width:1280px;margin:0 auto}
+  .group{margin-bottom:2rem}
+  .group h2{font-family:Georgia,serif;font-size:1.4rem;margin-bottom:.4rem;letter-spacing:-.01em}
+  .group .count{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:inline-block;padding:.2rem .6rem;background:var(--paper-warm);border-radius:2px}
+
+  .row{background:#fff;border:1px solid var(--border);padding:1rem 1.2rem;margin-bottom:.7rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;transition:border-color .15s}
+  .row.dirty{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+  .row.hidden{display:none}
+  .row .label{grid-column:1/-1;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+  .row .label .key{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.65rem;color:var(--teal);letter-spacing:.05em;text-transform:none}
+
+  .field{display:flex;flex-direction:column;gap:.3rem}
+  .field .lang{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .field textarea{width:100%;min-height:60px;padding:.6rem .75rem;border:1px solid var(--border);background:#fff;font-family:inherit;font-size:.92rem;line-height:1.4;color:var(--navy);resize:vertical;transition:border-color .15s}
+  .field textarea:focus{outline:none;border-color:var(--teal)}
+  .field textarea.html-content{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.82rem;background:#fafafa}
+
+  .savebar{position:fixed;bottom:0;left:0;right:0;background:var(--navy);color:var(--paper);padding:.85rem 1.5rem;display:flex;justify-content:space-between;align-items:center;transform:translateY(100%);transition:transform .25s;z-index:20}
+  .savebar.show{transform:translateY(0)}
+  .savebar .info{font-size:.85rem}
+  .savebar .info b{color:var(--gold)}
+  .savebar button{background:var(--gold);color:var(--navy-deep);border-color:var(--gold)}
+  .savebar button:hover{background:var(--paper);border-color:var(--paper)}
+  .savebar button.cancel{background:transparent;color:var(--paper);border-color:rgba(255,255,255,.4);margin-right:.5rem}
+  .savebar button.cancel:hover{background:rgba(255,255,255,.1)}
+
+  .toast{position:fixed;top:1rem;right:1rem;background:var(--teal);color:#fff;padding:.7rem 1rem;font-size:.85rem;z-index:30;opacity:0;transform:translateX(20px);transition:all .25s}
+  .toast.show{opacity:1;transform:translateX(0)}
+  .toast.error{background:#c33}
+
+  @media (max-width:720px){
+    .row{grid-template-columns:1fr}
+    header{padding:.8rem 1rem}
+    main{padding:1rem}
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>İçerik Paneli</h1>
+      <div class="meta">Speak Up Youth · TR / EN</div>
+    </div>
+    <div class="actions">
+      <a href="/" target="_blank" class="btn">Siteyi Gör ↗</a>
+      <form method="post" action="/admin/logout" style="display:inline">
+        <button type="submit" class="ghost">Çıkış</button>
+      </form>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <input type="search" id="search" placeholder="Metin içinde ara…">
+    <select id="filter">
+      <option value="">Tüm bölümler</option>
+    </select>
+    <span id="stats" class="meta" style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)"></span>
+  </div>
+
+  <main id="root"></main>
+
+  <div class="savebar" id="savebar">
+    <div class="info"><b id="dirtyCount">0</b> kayıtsız değişiklik var</div>
+    <div>
+      <button class="cancel" id="discardBtn" type="button">Vazgeç</button>
+      <button class="primary" id="saveBtn" type="button">Kaydet</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const SECTION_LABELS = {
+  nav: 'Navigasyon',
+  hero: 'Açılış (Hero)',
+  manifesto: 'Manifesto',
+  kimler: 'Kimler Başvurabilir',
+  forum: 'Forum Detayları',
+  topics: 'Konular',
+  partners: 'Ortaklar',
+  'cta-section': 'İletişim / CTA',
+  basvuru: 'Başvuru Bölümü',
+  sss: 'SSS',
+  'eu-section': 'AB Logosu Bölümü',
+  footer: 'Footer',
+  genel: 'Genel'
+};
+
+let original = {};
+let edits = {}; // key -> { tr?, en? } only changed fields
+
+const root = document.getElementById('root');
+const search = document.getElementById('search');
+const filter = document.getElementById('filter');
+const stats = document.getElementById('stats');
+const savebar = document.getElementById('savebar');
+const dirtyCount = document.getElementById('dirtyCount');
+
+function looksLikeHTML(s) {
+  return /<[a-z][^>]*>/i.test(s || '');
+}
+
+function render() {
+  const groups = {};
+  const order = [];
+  for (const [key, val] of Object.entries(original)) {
+    const sec = val.section || 'genel';
+    if (!groups[sec]) { groups[sec] = []; order.push(sec); }
+    groups[sec].push([key, val]);
+  }
+
+  // populate filter
+  const fragOpts = document.createDocumentFragment();
+  for (const sec of order) {
+    const o = document.createElement('option');
+    o.value = sec;
+    o.textContent = (SECTION_LABELS[sec] || sec) + ' (' + groups[sec].length + ')';
+    fragOpts.appendChild(o);
+  }
+  filter.innerHTML = '<option value="">Tüm bölümler</option>';
+  filter.appendChild(fragOpts);
+
+  const frag = document.createDocumentFragment();
+  for (const sec of order) {
+    const g = document.createElement('section');
+    g.className = 'group';
+    g.dataset.section = sec;
+    g.innerHTML = '<h2>' + (SECTION_LABELS[sec] || sec) + '</h2><span class="count">' + groups[sec].length + ' alan</span>';
+    for (const [key, val] of groups[sec]) {
+      g.appendChild(rowEl(key, val));
+    }
+    frag.appendChild(g);
+  }
+  root.innerHTML = '';
+  root.appendChild(frag);
+  updateStats();
+}
+
+function rowEl(key, val) {
+  const r = document.createElement('div');
+  r.className = 'row';
+  r.dataset.key = key;
+  r.dataset.section = val.section || 'genel';
+  r.dataset.label = (val.label || '').toLowerCase();
+  r.dataset.text = ((val.tr || '') + ' ' + (val.en || '')).toLowerCase();
+
+  const isHTML = looksLikeHTML(val.tr) || looksLikeHTML(val.en);
+  const cls = isHTML ? 'html-content' : '';
+
+  r.innerHTML = ''
+    + '<div class="label"><span>' + escapeHtml(val.label || '(boş)') + '</span><span class="key">' + key + (isHTML ? ' · HTML' : '') + '</span></div>'
+    + '<div class="field"><span class="lang">Türkçe</span><textarea data-key="' + key + '" data-lang="tr" class="' + cls + '">' + escapeHtml(val.tr || '') + '</textarea></div>'
+    + '<div class="field"><span class="lang">English</span><textarea data-key="' + key + '" data-lang="en" class="' + cls + '">' + escapeHtml(val.en || '') + '</textarea></div>';
+
+  return r;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (!t.matches('textarea[data-key]')) return;
+  const key = t.dataset.key;
+  const lang = t.dataset.lang;
+  const newVal = t.value;
+  const orig = (original[key] || {})[lang] || '';
+  if (!edits[key]) edits[key] = {};
+  if (newVal === orig) {
+    delete edits[key][lang];
+    if (Object.keys(edits[key]).length === 0) delete edits[key];
+  } else {
+    edits[key][lang] = newVal;
+  }
+  const row = t.closest('.row');
+  row.classList.toggle('dirty', !!edits[key]);
+  updateSavebar();
+});
+
+function updateSavebar() {
+  const n = Object.keys(edits).length;
+  dirtyCount.textContent = n;
+  savebar.classList.toggle('show', n > 0);
+}
+
+function updateStats() {
+  const total = Object.keys(original).length;
+  stats.textContent = total + ' alan';
+}
+
+function applyFilter() {
+  const q = search.value.trim().toLowerCase();
+  const sec = filter.value;
+  let visible = 0;
+  for (const row of root.querySelectorAll('.row')) {
+    const matchSec = !sec || row.dataset.section === sec;
+    const matchQ = !q || row.dataset.text.includes(q) || row.dataset.label.includes(q) || row.dataset.key.includes(q);
+    const show = matchSec && matchQ;
+    row.classList.toggle('hidden', !show);
+    if (show) visible++;
+  }
+  for (const g of root.querySelectorAll('.group')) {
+    const any = g.querySelector('.row:not(.hidden)');
+    g.style.display = any ? '' : 'none';
+  }
+  stats.textContent = visible + ' / ' + Object.keys(original).length + ' alan';
+}
+
+search.addEventListener('input', applyFilter);
+filter.addEventListener('change', applyFilter);
+
+document.getElementById('discardBtn').addEventListener('click', () => {
+  if (!confirm('Tüm kayıtsız değişiklikleri at?')) return;
+  edits = {};
+  render();
+  updateSavebar();
+});
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.textContent = 'Kaydediliyor…';
+  try {
+    const r = await fetch('/admin/api/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(edits),
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    // pull fresh state
+    for (const [k, v] of Object.entries(edits)) {
+      if (!original[k]) continue;
+      if (v.tr != null) original[k].tr = v.tr;
+      if (v.en != null) original[k].en = v.en;
+    }
+    edits = {};
+    document.querySelectorAll('.row.dirty').forEach(r => r.classList.remove('dirty'));
+    updateSavebar();
+    toast('Kaydedildi · değişiklikler canlıda');
+  } catch (e) {
+    toast('Hata: ' + e.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Kaydet';
+  }
+});
+
+window.addEventListener('beforeunload', e => {
+  if (Object.keys(edits).length > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!isErr);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+(async () => {
+  const r = await fetch('/admin/api/content');
+  original = await r.json();
+  render();
+})();
+</script>
+</body>
+</html>
